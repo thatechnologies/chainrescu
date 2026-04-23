@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Send, CheckCircle2, ShieldAlert } from "lucide-react";
+import { Send, CheckCircle2, ShieldAlert, AlertCircle } from "lucide-react";
 import { z } from "zod";
+import { toast } from "sonner";
 
 const schema = z.object({
   name: z.string().trim().min(1, "Name required").max(100),
@@ -24,11 +25,13 @@ const categories = [
 export function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [formError, setFormError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setErrors({});
+    setFormError(null);
     const fd = new FormData(e.currentTarget);
     const data = Object.fromEntries(fd.entries());
     const parsed = schema.safeParse(data);
@@ -38,6 +41,9 @@ export function ContactForm() {
         if (i.path[0]) errs[i.path[0] as string] = i.message;
       });
       setErrors(errs);
+      toast.error("Please fix the highlighted fields", {
+        description: "A few details need attention before we can send your case.",
+      });
       return;
     }
     setLoading(true);
@@ -49,12 +55,19 @@ export function ContactForm() {
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        setErrors({ message: err.error ?? "Failed to send. Please try again." });
+        const msg = err.error ?? "Failed to send. Please try again.";
+        setFormError(msg);
+        toast.error("Couldn't send your support case", { description: msg });
         return;
       }
       setSubmitted(true);
+      toast.success("Support case sent", {
+        description: "A specialist will reach out by email shortly.",
+      });
     } catch {
-      setErrors({ message: "Network error. Please try again." });
+      const msg = "Network error. Please check your connection and try again.";
+      setFormError(msg);
+      toast.error("Network error", { description: msg });
     } finally {
       setLoading(false);
     }
@@ -177,6 +190,16 @@ export function ContactForm() {
                       placeholder="What were you trying to do? What went wrong? Any error messages or transaction hashes?"
                     />
                   </Field>
+
+                  {formError && (
+                    <div
+                      role="alert"
+                      className="flex items-start gap-3 rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+                    >
+                      <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                      <span>{formError}</span>
+                    </div>
+                  )}
 
                   <button
                     type="submit"
