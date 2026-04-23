@@ -318,3 +318,27 @@ function Field({
     </div>
   );
 }
+
+function SummaryRow({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="px-5 py-3 flex items-center justify-between gap-4">
+      <dt className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </dt>
+      <dd className="text-sm text-foreground/90 text-right break-all">{value}</dd>
+    </div>
+  );
+}
+
+function urgencyClass(u: string) {
+  switch (u) {
+    case "Critical":
+      return "bg-destructive/15 text-destructive border border-destructive/30";
+    case "High":
+      return "bg-warning/15 text-warning border border-warning/30";
+    case "Medium":
+      return "bg-primary/15 text-primary border border-primary/30";
+    default:
+      return "bg-success/15 text-success border border-success/30";
+  }
+}
