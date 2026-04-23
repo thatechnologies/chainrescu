@@ -112,14 +112,65 @@ export function ContactForm() {
           <div className="lg:col-span-3">
             <div className="rounded-2xl border border-border bg-gradient-card p-8 shadow-elevated backdrop-blur">
               {submitted ? (
-                <div className="py-12 text-center">
-                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success/15 border border-success/30">
-                    <CheckCircle2 className="h-8 w-8 text-success" />
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success/15 border border-success/30 shadow-glow">
+                      <CheckCircle2 className="h-8 w-8 text-success" />
+                    </div>
+                    <h3 className="mt-5 text-2xl font-bold">Case opened</h3>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      A specialist will reach out via email shortly. Check your inbox (and spam).
+                    </p>
+                    <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-border bg-input/40 px-3 py-1 font-mono text-xs text-muted-foreground">
+                      <span className="text-muted-foreground/70">Case ID</span>
+                      <span className="text-foreground font-semibold">{submitted.caseId}</span>
+                    </div>
                   </div>
-                  <h3 className="mt-6 text-2xl font-bold">Case opened</h3>
-                  <p className="mt-2 text-muted-foreground">
-                    A specialist will reach out via email shortly. Check your inbox (and spam).
-                  </p>
+
+                  <div className="rounded-xl border border-border bg-input/30 overflow-hidden">
+                    <div className="px-5 py-3 border-b border-border flex items-center justify-between">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Summary of what we received
+                      </span>
+                      <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                        <Clock className="h-3 w-3" />
+                        {new Date(submitted.submittedAt).toLocaleString()}
+                      </span>
+                    </div>
+                    <dl className="divide-y divide-border">
+                      <SummaryRow label="Name" value={submitted.name} />
+                      <SummaryRow label="Email" value={submitted.email} />
+                      <SummaryRow label="Wallet" value={submitted.wallet} />
+                      <SummaryRow label="Category" value={submitted.category} />
+                      <SummaryRow
+                        label="Urgency"
+                        value={
+                          <span
+                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${urgencyClass(submitted.urgency)}`}
+                          >
+                            {submitted.urgency}
+                          </span>
+                        }
+                      />
+                      <div className="px-5 py-3">
+                        <dt className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
+                          Message
+                        </dt>
+                        <dd className="whitespace-pre-wrap text-sm text-foreground/90 leading-relaxed">
+                          {submitted.message}
+                        </dd>
+                      </div>
+                    </dl>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={resetForm}
+                    className="group flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-card/50 px-6 py-3 text-sm font-semibold text-foreground hover:bg-card hover:border-primary/40 transition-all"
+                  >
+                    <RotateCcw className="h-4 w-4 group-hover:-rotate-45 transition-transform" />
+                    Submit another case
+                  </button>
                 </div>
               ) : (
                 <form onSubmit={onSubmit} className="space-y-5" noValidate>
