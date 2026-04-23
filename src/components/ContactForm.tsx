@@ -26,7 +26,7 @@ export function ContactForm() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setErrors({});
     const fd = new FormData(e.currentTarget);
@@ -41,10 +41,23 @@ export function ContactForm() {
       return;
     }
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(parsed.data),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        setErrors({ message: err.error ?? "Failed to send. Please try again." });
+        return;
+      }
       setSubmitted(true);
-    }, 800);
+    } catch {
+      setErrors({ message: "Network error. Please try again." });
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
