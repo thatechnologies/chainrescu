@@ -1,4 +1,4 @@
-import { ArrowRight, Lock, Zap } from "lucide-react";
+import { ArrowRight, Lock, Zap, Shield } from "lucide-react";
 
 export function Hero() {
   return (
@@ -62,5 +62,3 @@ export function Hero() {
     </section>
   );
 }
-
-import { Shield } from "lucide-react";
