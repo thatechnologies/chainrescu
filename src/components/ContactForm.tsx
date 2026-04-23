@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Send, CheckCircle2, ShieldAlert } from "lucide-react";
+import { Send, CheckCircle2, ShieldAlert, AlertCircle } from "lucide-react";
 import { z } from "zod";
+import { toast } from "sonner";
 
 const schema = z.object({
   name: z.string().trim().min(1, "Name required").max(100),
