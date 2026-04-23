@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Send, CheckCircle2, ShieldAlert, AlertCircle } from "lucide-react";
+import { Send, CheckCircle2, ShieldAlert, AlertCircle, RotateCcw, Clock } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
 
@@ -22,11 +22,19 @@ const categories = [
   "General help",
 ];
 
+type SubmittedData = z.infer<typeof schema> & { submittedAt: string; caseId: string };
+
 export function ContactForm() {
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState<SubmittedData | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  function resetForm() {
+    setSubmitted(null);
+    setErrors({});
+    setFormError(null);
+  }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -60,7 +68,8 @@ export function ContactForm() {
         toast.error("Couldn't send your support case", { description: msg });
         return;
       }
-      setSubmitted(true);
+      const caseId = `CR-${Date.now().toString(36).toUpperCase().slice(-6)}`;
+      setSubmitted({ ...parsed.data, submittedAt: new Date().toISOString(), caseId });
       toast.success("Support case sent", {
         description: "A specialist will reach out by email shortly.",
       });
@@ -103,14 +112,65 @@ export function ContactForm() {
           <div className="lg:col-span-3">
             <div className="rounded-2xl border border-border bg-gradient-card p-8 shadow-elevated backdrop-blur">
               {submitted ? (
-                <div className="py-12 text-center">
-                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success/15 border border-success/30">
-                    <CheckCircle2 className="h-8 w-8 text-success" />
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success/15 border border-success/30 shadow-glow">
+                      <CheckCircle2 className="h-8 w-8 text-success" />
+                    </div>
+                    <h3 className="mt-5 text-2xl font-bold">Case opened</h3>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      A specialist will reach out via email shortly. Check your inbox (and spam).
+                    </p>
+                    <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-border bg-input/40 px-3 py-1 font-mono text-xs text-muted-foreground">
+                      <span className="text-muted-foreground/70">Case ID</span>
+                      <span className="text-foreground font-semibold">{submitted.caseId}</span>
+                    </div>
                   </div>
-                  <h3 className="mt-6 text-2xl font-bold">Case opened</h3>
-                  <p className="mt-2 text-muted-foreground">
-                    A specialist will reach out via email shortly. Check your inbox (and spam).
-                  </p>
+
+                  <div className="rounded-xl border border-border bg-input/30 overflow-hidden">
+                    <div className="px-5 py-3 border-b border-border flex items-center justify-between">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Summary of what we received
+                      </span>
+                      <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                        <Clock className="h-3 w-3" />
+                        {new Date(submitted.submittedAt).toLocaleString()}
+                      </span>
+                    </div>
+                    <dl className="divide-y divide-border">
+                      <SummaryRow label="Name" value={submitted.name} />
+                      <SummaryRow label="Email" value={submitted.email} />
+                      <SummaryRow label="Wallet" value={submitted.wallet} />
+                      <SummaryRow label="Category" value={submitted.category} />
+                      <SummaryRow
+                        label="Urgency"
+                        value={
+                          <span
+                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${urgencyClass(submitted.urgency)}`}
+                          >
+                            {submitted.urgency}
+                          </span>
+                        }
+                      />
+                      <div className="px-5 py-3">
+                        <dt className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
+                          Message
+                        </dt>
+                        <dd className="whitespace-pre-wrap text-sm text-foreground/90 leading-relaxed">
+                          {submitted.message}
+                        </dd>
+                      </div>
+                    </dl>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={resetForm}
+                    className="group flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-card/50 px-6 py-3 text-sm font-semibold text-foreground hover:bg-card hover:border-primary/40 transition-all"
+                  >
+                    <RotateCcw className="h-4 w-4 group-hover:-rotate-45 transition-transform" />
+                    Submit another case
+                  </button>
                 </div>
               ) : (
                 <form onSubmit={onSubmit} className="space-y-5" noValidate>
@@ -257,4 +317,28 @@ function Field({
       {error && <p className="mt-1.5 text-xs text-destructive">{error}</p>}
     </div>
   );
+}
+
+function SummaryRow({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="px-5 py-3 flex items-center justify-between gap-4">
+      <dt className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </dt>
+      <dd className="text-sm text-foreground/90 text-right break-all">{value}</dd>
+    </div>
+  );
+}
+
+function urgencyClass(u: string) {
+  switch (u) {
+    case "Critical":
+      return "bg-destructive/15 text-destructive border border-destructive/30";
+    case "High":
+      return "bg-warning/15 text-warning border border-warning/30";
+    case "Medium":
+      return "bg-primary/15 text-primary border border-primary/30";
+    default:
+      return "bg-success/15 text-success border border-success/30";
+  }
 }
