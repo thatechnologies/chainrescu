@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Send, CheckCircle2, ShieldAlert, AlertCircle } from "lucide-react";
+import { Send, CheckCircle2, ShieldAlert, AlertCircle, RotateCcw, Clock } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
 
@@ -22,11 +22,19 @@ const categories = [
   "General help",
 ];
 
+type SubmittedData = z.infer<typeof schema> & { submittedAt: string; caseId: string };
+
 export function ContactForm() {
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState<SubmittedData | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  function resetForm() {
+    setSubmitted(null);
+    setErrors({});
+    setFormError(null);
+  }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -60,7 +68,8 @@ export function ContactForm() {
         toast.error("Couldn't send your support case", { description: msg });
         return;
       }
-      setSubmitted(true);
+      const caseId = `CR-${Date.now().toString(36).toUpperCase().slice(-6)}`;
+      setSubmitted({ ...parsed.data, submittedAt: new Date().toISOString(), caseId });
       toast.success("Support case sent", {
         description: "A specialist will reach out by email shortly.",
       });
