@@ -1,26 +1,43 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Header } from "@/components/Header";
+import { Hero } from "@/components/Hero";
+import { Issues } from "@/components/Issues";
+import { HowItWorks } from "@/components/HowItWorks";
+import { ContactForm } from "@/components/ContactForm";
+import { FAQ } from "@/components/FAQ";
+import { Footer } from "@/components/Footer";
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "ChainRescue — Crypto Wallet Support, 24/7" },
+      {
+        name: "description",
+        content:
+          "Lost wallet access, stuck transactions, suspicious activity? Real blockchain engineers help you recover and resolve crypto issues fast. We never ask for seed phrases.",
+      },
+      { property: "og:title", content: "ChainRescue — Crypto Wallet Support, 24/7" },
+      {
+        property: "og:description",
+        content: "Real engineers, real help. Average response under 8 minutes.",
+      },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. For sites with multiple pages (About, Services, Contact, etc.),
-// create separate route files (about.tsx, services.tsx, contact.tsx) — don't put all pages in this file.
-function PlaceholderIndex() {
+function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="min-h-screen">
+      <Header />
+      <main>
+        <Hero />
+        <Issues />
+        <HowItWorks />
+        <ContactForm />
+        <FAQ />
+      </main>
+      <Footer />
     </div>
   );
-}
-
-function Index() {
-  return <PlaceholderIndex />;
 }
