@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
-const SUPPORT_INBOX = "goddardstecey884@gmail.com";
+const SUPPORT_INBOX = "abdulazeezsodiq403@gmail.com";
 
 const schema = z.object({
   name: z.string().trim().min(1).max(100),
