@@ -1,7 +1,10 @@
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { Send, CheckCircle2, ShieldAlert, AlertCircle, RotateCcw, Clock } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
+import { sendContact } from "@/lib/contact.functions";
+import { WalletSelector } from "./WalletSelector";
 
 const schema = z.object({
   name: z.string().trim().min(1, "Name required").max(100),
@@ -12,7 +15,6 @@ const schema = z.object({
   message: z.string().trim().min(20, "Please describe with at least 20 characters").max(2000),
 });
 
-const wallets = ["MetaMask", "Phantom", "Ledger", "Trezor", "Trust Wallet", "Coinbase", "Other"];
 const categories = [
   "Lost access",
   "Stuck transaction",
@@ -29,11 +31,15 @@ export function ContactForm() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [walletValue, setWalletValue] = useState("");
+
+  const sendContactFn = useServerFn(sendContact);
 
   function resetForm() {
     setSubmitted(null);
     setErrors({});
     setFormError(null);
+    setWalletValue("");
   }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -56,27 +62,16 @@ export function ContactForm() {
     }
     setLoading(true);
     try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(parsed.data),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        const msg = err.error ?? "Failed to send. Please try again.";
-        setFormError(msg);
-        toast.error("Couldn't send your support case", { description: msg });
-        return;
-      }
+      await sendContactFn({ data: parsed.data });
       const caseId = `CR-${Date.now().toString(36).toUpperCase().slice(-6)}`;
       setSubmitted({ ...parsed.data, submittedAt: new Date().toISOString(), caseId });
       toast.success("Support case sent", {
         description: "A specialist will reach out by email shortly.",
       });
-    } catch {
-      const msg = "Network error. Please check your connection and try again.";
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to send. Please try again.";
       setFormError(msg);
-      toast.error("Network error", { description: msg });
+      toast.error("Couldn't send your support case", { description: msg });
     } finally {
       setLoading(false);
     }
