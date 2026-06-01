@@ -191,16 +191,12 @@ export function ContactForm() {
 
                   <div className="grid sm:grid-cols-2 gap-5">
                     <Field label="Wallet" error={errors.wallet}>
-                      <select name="wallet" className="form-input" defaultValue="">
-                        <option value="" disabled>
-                          Select wallet
-                        </option>
-                        {wallets.map((w) => (
-                          <option key={w} value={w}>
-                            {w}
-                          </option>
-                        ))}
-                      </select>
+                      <WalletSelector
+                        name="wallet"
+                        value={walletValue}
+                        onChange={setWalletValue}
+                        error={errors.wallet}
+                      />
                     </Field>
                     <Field label="Issue category" error={errors.category}>
                       <select name="category" className="form-input" defaultValue="">
