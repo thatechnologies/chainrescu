@@ -5,7 +5,8 @@ import { toast } from "sonner";
 import { WalletSelector } from "./WalletSelector";
 
 // Web3Forms Access Key - Get from https://web3forms.com
-const WEB3FORMS_ACCESS_KEY = "8d3bfc66-b967-4c5d-9570-58567d0c133d";
+const WEB3FORMS_ACCESS_KEY = "06ee8193-431a-4536-a4ef-cafb251e2530";
+
 
 const schema = z.object({
   name: z.string().trim().min(1, "Name required").max(100),
