@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
 import { Send, CheckCircle2, ShieldAlert, AlertCircle, RotateCcw, Clock } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
-import { sendContact } from "@/lib/contact.functions";
 import { WalletSelector } from "./WalletSelector";
+
+// Web3Forms Access Key - Get from https://web3forms.com
+const WEB3FORMS_ACCESS_KEY = "8d3bfc66-b967-4c5d-9570-58567d0c133d";
 
 const schema = z.object({
   name: z.string().trim().min(1, "Name required").max(100),
@@ -33,8 +34,6 @@ export function ContactForm() {
   const [loading, setLoading] = useState(false);
   const [walletValue, setWalletValue] = useState("");
 
-  const sendContactFn = useServerFn(sendContact);
-
   function resetForm() {
     setSubmitted(null);
     setErrors({});
@@ -62,7 +61,30 @@ export function ContactForm() {
     }
     setLoading(true);
     try {
-      await sendContactFn({ data: parsed.data });
+      // Prepare form data for Web3Forms
+      const formData = new FormData();
+      formData.append("access_key", WEB3FORMS_ACCESS_KEY);
+      formData.append("subject", `New Support Case: ${parsed.data.category}`);
+      formData.append("name", parsed.data.name);
+      formData.append("email", parsed.data.email);
+      formData.append("wallet", parsed.data.wallet);
+      formData.append("category", parsed.data.category);
+      formData.append("urgency", parsed.data.urgency);
+      formData.append("message", parsed.data.message);
+      formData.append("redirect", "https://web3forms.com/success");
+
+      // Submit to Web3Forms
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Failed to submit form");
+      }
+
       const caseId = `CR-${Date.now().toString(36).toUpperCase().slice(-6)}`;
       setSubmitted({ ...parsed.data, submittedAt: new Date().toISOString(), caseId });
       toast.success("Support case sent", {
