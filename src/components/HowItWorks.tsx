@@ -35,7 +35,7 @@ export function HowItWorks() {
           <div className="hidden md:block absolute top-8 left-[16%] right-[16%] h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
           {steps.map((s) => (
             <div key={s.n} className="relative text-center">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-card border border-primary/30 shadow-glow font-display text-xl font-bold text-gradient-primary">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-card border border-primary/30 shadow-glow font-display text-xl font-bold text-white">
                 {s.n}
               </div>
               <h3 className="mt-6 text-xl font-semibold">{s.title}</h3>

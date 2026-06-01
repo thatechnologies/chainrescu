@@ -11,7 +11,7 @@ export function Hero() {
           <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/50 px-4 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-pulse-glow rounded-full bg-success opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-green-300" />
             </span>
             24/7 Expert Support · Avg. response &lt; 8 min
           </div>
@@ -55,6 +55,62 @@ export function Hero() {
             <div className="flex items-center gap-2">
               <Shield className="h-4 w-4 text-primary" />
               4,200+ wallets recovered
+            </div>
+          </div>
+
+          {/* Wallet Logos Marquee */}
+          <div className="mt-16">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-6">
+              We Support All Major Wallets
+            </p>
+            <div className="relative overflow-hidden">
+              <div className="flex animate-marquee gap-8 w-max">
+                {/* First set of logos */}
+                {[
+                  { name: "MetaMask", icon: "🦊" },
+                  { name: "Trust Wallet", icon: "💙" },
+                  { name: "Ledger", icon: "🔐" },
+                  { name: "Trezor", icon: "💼" },
+                  { name: "Phantom", icon: "👻" },
+                  { name: "Coinbase", icon: "🪙" },
+                  { name: "Argent", icon: "⚔️" },
+                  { name: "Gnosis", icon: "🦅" },
+                  { name: "WalletConnect", icon: "🔗" },
+                  { name: "Keplr", icon: "🌌" },
+                ].map((wallet, idx) => (
+                  <div
+                    key={`wallet-${idx}`}
+                    className="flex flex-col items-center gap-2 px-4 py-3 rounded-lg bg-card/30 border border-border/30 backdrop-blur-sm whitespace-nowrap hover:bg-card/50 transition-colors"
+                  >
+                    <span className="text-3xl">{wallet.icon}</span>
+                    <span className="text-xs font-medium text-foreground">{wallet.name}</span>
+                  </div>
+                ))}
+                {/* Duplicate set for seamless loop */}
+                {[
+                  { name: "MetaMask", icon: "🦊" },
+                  { name: "Trust Wallet", icon: "💙" },
+                  { name: "Ledger", icon: "🔐" },
+                  { name: "Trezor", icon: "💼" },
+                  { name: "Phantom", icon: "👻" },
+                  { name: "Coinbase", icon: "🪙" },
+                  { name: "Argent", icon: "⚔️" },
+                  { name: "Gnosis", icon: "🦅" },
+                  { name: "WalletConnect", icon: "🔗" },
+                  { name: "Keplr", icon: "🌌" },
+                ].map((wallet, idx) => (
+                  <div
+                    key={`wallet-duplicate-${idx}`}
+                    className="flex flex-col items-center gap-2 px-4 py-3 rounded-lg bg-card/30 border border-border/30 backdrop-blur-sm whitespace-nowrap hover:bg-card/50 transition-colors"
+                  >
+                    <span className="text-3xl">{wallet.icon}</span>
+                    <span className="text-xs font-medium text-foreground">{wallet.name}</span>
+                  </div>
+                ))}
+              </div>
+              {/* Gradient overlays for fade effect */}
+              <div className="absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-background to-transparent pointer-events-none" />
+              <div className="absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-background to-transparent pointer-events-none" />
             </div>
           </div>
         </div>
