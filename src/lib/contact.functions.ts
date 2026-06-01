@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
@@ -22,44 +22,29 @@ function escapeHtml(s: string) {
     .replace(/'/g, "&#039;");
 }
 
-export const Route = createFileRoute("/api/contact")({
-  server: {
-    handlers: {
-      POST: async ({ request }) => {
-        const LOVABLE_API_KEY = process.env.LOVABLE_API_KEY;
-        const RESEND_API_KEY = process.env.RESEND_API_KEY;
-        if (!LOVABLE_API_KEY) {
-          return Response.json({ error: "LOVABLE_API_KEY not configured" }, { status: 500 });
-        }
-        if (!RESEND_API_KEY) {
-          return Response.json({ error: "RESEND_API_KEY not configured" }, { status: 500 });
-        }
+export const sendContact = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => schema.parse(data))
+  .handler(async ({ data }) => {
+    const LOVABLE_API_KEY = process.env.LOVABLE_API_KEY;
+    const RESEND_API_KEY = process.env.RESEND_API_KEY;
+    if (!LOVABLE_API_KEY) {
+      throw new Error("LOVABLE_API_KEY not configured");
+    }
+    if (!RESEND_API_KEY) {
+      throw new Error("RESEND_API_KEY not configured");
+    }
 
-        let body: unknown;
-        try {
-          body = await request.json();
-        } catch {
-          return Response.json({ error: "Invalid JSON" }, { status: 400 });
-        }
+    const d = data;
 
-        const parsed = schema.safeParse(body);
-        if (!parsed.success) {
-          return Response.json(
-            { error: "Validation failed", issues: parsed.error.issues },
-            { status: 400 },
-          );
-        }
-        const d = parsed.data;
+    const urgencyColor: Record<string, string> = {
+      Low: "#4ade80",
+      Medium: "#facc15",
+      High: "#fb923c",
+      Critical: "#ef4444",
+    };
+    const color = urgencyColor[d.urgency] ?? "#94a3b8";
 
-        const urgencyColor: Record<string, string> = {
-          Low: "#4ade80",
-          Medium: "#facc15",
-          High: "#fb923c",
-          Critical: "#ef4444",
-        };
-        const color = urgencyColor[d.urgency] ?? "#94a3b8";
-
-        const html = `
+    const html = `
 <!doctype html><html><body style="margin:0;background:#0f172a;font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#e2e8f0;padding:24px">
   <div style="max-width:600px;margin:0 auto;background:#1e293b;border-radius:12px;overflow:hidden;border:1px solid #334155">
     <div style="background:linear-gradient(135deg,#06b6d4,#a855f7);padding:20px 24px">
@@ -81,7 +66,7 @@ export const Route = createFileRoute("/api/contact")({
   </div>
 </body></html>`.trim();
 
-        const text = `New support case
+    const text = `New support case
 Name: ${d.name}
 Email: ${d.email}
 Wallet: ${d.wallet}
@@ -91,34 +76,28 @@ Urgency: ${d.urgency}
 Message:
 ${d.message}`;
 
-        const res = await fetch(`${GATEWAY_URL}/emails`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${LOVABLE_API_KEY}`,
-            "X-Connection-Api-Key": RESEND_API_KEY,
-          },
-          body: JSON.stringify({
-            from: "ChainRescue Support <onboarding@resend.dev>",
-            to: [SUPPORT_INBOX],
-            reply_to: d.email,
-            subject: `[${d.urgency}] ${d.category} — ${d.name} (${d.wallet})`,
-            html,
-            text,
-          }),
-        });
-
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) {
-          console.error("Resend send failed", res.status, data);
-          return Response.json(
-            { error: `Email send failed [${res.status}]`, details: data },
-            { status: 502 },
-          );
-        }
-
-        return Response.json({ success: true, id: (data as { id?: string }).id });
+    const res = await fetch(`${GATEWAY_URL}/emails`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "X-Connection-Api-Key": RESEND_API_KEY,
       },
-    },
-  },
-});
+      body: JSON.stringify({
+        from: "ChainRescue Support <onboarding@resend.dev>",
+        to: [SUPPORT_INBOX],
+        reply_to: d.email,
+        subject: `[${d.urgency}] ${d.category} — ${d.name} (${d.wallet})`,
+        html,
+        text,
+      }),
+    });
+
+    const responseData = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      console.error("Resend send failed", res.status, responseData);
+      throw new Error(`Email send failed [${res.status}]`);
+    }
+
+    return { success: true, id: (responseData as { id?: string }).id };
+  });
