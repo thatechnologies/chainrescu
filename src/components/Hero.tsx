@@ -6,6 +6,29 @@ export function Hero() {
       <div className="absolute inset-0 bg-gradient-hero" />
       <div className="absolute inset-0 grid-pattern opacity-40 [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" />
 
+      {/* Floating Crypto Elements */}
+      <div className="absolute top-10 left-10 text-5xl opacity-30 animate-float text-primary drop-shadow-glow" style={{ animationDelay: "0s" }}>
+        ₿
+      </div>
+      <div className="absolute top-20 right-16 text-4xl opacity-25 animate-float-slow text-blue-400 drop-shadow-glow" style={{ animationDelay: "1s" }}>
+        Ξ
+      </div>
+      <div className="absolute bottom-32 left-20 text-4xl opacity-30 animate-float-reverse text-cyan-400 drop-shadow-glow" style={{ animationDelay: "0.5s" }}>
+        ◇
+      </div>
+      <div className="absolute top-40 right-32 text-5xl opacity-25 animate-float-slow text-primary drop-shadow-glow" style={{ animationDelay: "2s" }}>
+        ●
+      </div>
+      <div className="absolute bottom-20 right-24 text-4xl opacity-30 animate-float-reverse text-blue-400 drop-shadow-glow" style={{ animationDelay: "1.5s" }}>
+        ⬟
+      </div>
+      <div className="absolute top-1/3 left-1/4 text-6xl opacity-20 animate-float text-cyan-400 drop-shadow-glow" style={{ animationDelay: "3s" }}>
+        ₿
+      </div>
+      <div className="absolute bottom-1/4 right-1/4 text-5xl opacity-25 animate-float-slow text-primary drop-shadow-glow" style={{ animationDelay: "2.5s" }}>
+        ◆
+      </div>
+
       <div className="relative mx-auto max-w-7xl px-6">
         <div className="mx-auto max-w-4xl text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/50 px-4 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur">
