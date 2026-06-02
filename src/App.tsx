@@ -15,7 +15,7 @@ function App() {
       <Issues />
       <HowItWorks />
       <ContactForm />
-      <FAQ />
+      {/* <FAQ /> */}
       <Footer />
       <Toaster richColors position="top-right" theme="dark" />
     </>
