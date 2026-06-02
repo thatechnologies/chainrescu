@@ -41,7 +41,7 @@ const issues = [
 
 export function Issues() {
   return (
-    <section id="issues" className="relative py-24">
+    <section id="issues" className="relative py-20"> 
       <div className="mx-auto max-w-7xl px-6">
         <div className="max-w-2xl">
           <div className="text-sm font-semibold uppercase tracking-widest text-primary">
@@ -53,7 +53,7 @@ export function Issues() {
             <span className="text-gradient">we've seen it before.</span>
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
-            Pick the issue closest to yours, or describe it in your own words. Real engineers
+            Pick the issue closest to yours, or describe it in your own words. Real support agents
             review every case.
           </p>
         </div>

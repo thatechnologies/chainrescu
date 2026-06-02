@@ -101,7 +101,7 @@ export function ContactForm() {
   }
 
   return (
-    <section id="contact" className="relative py-24">
+    <section id="contact" className="relative py-20">
       <div className="mx-auto max-w-5xl ">
         <div className="grid lg:grid-cols-5 gap-10 items-start">
           <div className="lg:col-span-2">
