@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Send, CheckCircle2, ShieldAlert, AlertCircle, RotateCcw, Clock } from "lucide-react";
+import { Send, CheckCircle2, ShieldAlert, AlertCircle, RotateCcw, Clock, Shield } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { WalletSelector } from "./WalletSelector";
@@ -14,7 +14,7 @@ const schema = z.object({
   wallet: z.string().trim().min(1, "Pick a wallet").max(50),
   category: z.string().min(1, "Pick a category"),
   urgency: z.string().min(1),
-  message: z.string().trim().min(12, "Please describe with at least 20 characters").max(2000),
+  message: z.string().trim().min(12, "Please describe with at least 12 characters").max(2000),
 });
 
 const categories = [
@@ -124,6 +124,8 @@ export function ContactForm() {
                 </p>
               </div>
             </div>
+
+           
           </div>
 
           <div className="lg:col-span-3">
@@ -254,7 +256,7 @@ export function ContactForm() {
                     </div>
                   </Field>
 
-                  <Field label="Describe what happened" error={errors.message}>
+                  <Field label="Secured and Encrypted" error={errors.message}>
                     <textarea
                       name="message"
                       rows={5}
@@ -284,9 +286,17 @@ export function ContactForm() {
                   </button>
                 </form>
               )}
+
+                <div className="flex items-center gap-2 mt-4 justify-center">
+          <Shield className="h-4 w-4 text-primary" />
+            Crypto <span className="text-gradient-primary">Resolve</span> Hub
+
+          <span>· © {new Date().getFullYear()}</span>
+        </div>
             </div>
           </div>
         </div>
+        
       </div>
 
       <style>{`

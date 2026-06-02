@@ -10,9 +10,9 @@ export function Footer() {
 
           <span>· © {new Date().getFullYear()}</span>
         </div>
-        <p className="text-xs">
+        {/* <p className="text-xs">
           Not affiliated with any wallet provider. We never ask for seed phrases.
-        </p>
+        </p> */}
       </div>
     </footer>
   );
