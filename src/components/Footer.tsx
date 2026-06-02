@@ -6,7 +6,8 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
         <div className="flex items-center gap-2">
           <Shield className="h-4 w-4 text-primary" />
-          <span className="font-display font-semibold text-foreground">ChainRescue</span>
+            Crypto <span className="text-gradient-primary">Resolve</span> Hub
+
           <span>· © {new Date().getFullYear()}</span>
         </div>
         <p className="text-xs">

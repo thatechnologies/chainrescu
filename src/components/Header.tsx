@@ -11,8 +11,8 @@ export function Header() {
               <Shield className="h-5 w-5 text-primary-foreground" strokeWidth={2.5} />
             </div>
           </div>
-          <span className="font-display text-lg font-bold tracking-tight">
-            Chain<span className="text-gradient-primary">Rescue</span>
+          <span className="font-display text-lg font-extrabold tracking-tight">
+            Crypto <span className="text-gradient-primary">Resolve</span> Hub
           </span>
         </a>
 
