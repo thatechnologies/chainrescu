@@ -12,7 +12,7 @@ export function Header() {
             </div>
           </div>
           <span className="font-display text-lg font-extrabold tracking-tight">
-            Crypto <span className="text-gradient-primary">Resolve</span> Hub
+           Chain<span className="text-gradient-primary">Rescues</span>
           </span>
         </a>
 

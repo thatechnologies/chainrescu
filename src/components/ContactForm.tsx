@@ -289,7 +289,7 @@ export function ContactForm() {
 
                 <div className="flex items-center gap-2 mt-4 justify-center">
           <Shield className="h-4 w-4 text-primary" />
-            Crypto <span className="text-gradient-primary">Resolve</span> Hub
+            Chain<span className="text-gradient-primary">Rescues</span>
 
           <span>· © {new Date().getFullYear()}</span>
         </div>
