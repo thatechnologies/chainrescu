@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Send, CheckCircle2, ShieldAlert, AlertCircle, RotateCcw, Clock, Shield } from "lucide-react";
+import { Send, ShieldAlert, AlertCircle, Shield } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { WalletSelector } from "./WalletSelector";
@@ -26,17 +26,13 @@ const categories = [
   "General help",
 ];
 
-type SubmittedData = z.infer<typeof schema> & { submittedAt: string; caseId: string };
-
 export function ContactForm() {
-  const [submitted, setSubmitted] = useState<SubmittedData | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [walletValue, setWalletValue] = useState("");
 
   function resetForm() {
-    setSubmitted(null);
     setErrors({});
     setFormError(null);
     setWalletValue("");
@@ -44,9 +40,10 @@ export function ContactForm() {
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const form = e.currentTarget;
     setErrors({});
     setFormError(null);
-    const fd = new FormData(e.currentTarget);
+    const fd = new FormData(form);
     const data = Object.fromEntries(fd.entries());
     const parsed = schema.safeParse(data);
     if (!parsed.success) {
@@ -86,11 +83,16 @@ export function ContactForm() {
         throw new Error(result.message || "Failed to submit form");
       }
 
-      const caseId = `CR-${Date.now().toString(36).toUpperCase().slice(-6)}`;
-      setSubmitted({ ...parsed.data, submittedAt: new Date().toISOString(), caseId });
       toast.success("Support case sent", {
         description: "A specialist will reach out by email shortly.",
       });
+
+      // Reset form and states
+      form.reset();
+      resetForm();
+
+      // Redirect to hero section after successful submission
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to send. Please try again.";
       setFormError(msg);
@@ -130,164 +132,101 @@ export function ContactForm() {
 
           <div className="lg:col-span-3">
             <div className="rounded-2xl border border-border bg-gradient-card p-8 shadow-elevated backdrop-blur">
-              {submitted ? (
-                <div className="space-y-6">
-                  <div className="text-center">
-                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success/15 border border-success/30 shadow-glow">
-                      <CheckCircle2 className="h-8 w-8 text-success" />
-                    </div>
-                    <h3 className="mt-5 text-2xl font-bold">Case opened</h3>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      A specialist will reach out via email shortly. Check your inbox (and spam).
-                    </p>
-                    <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-border bg-input/40 px-3 py-1 font-mono text-xs text-muted-foreground">
-                      <span className="text-muted-foreground/70">Case ID</span>
-                      <span className="text-foreground font-semibold">{submitted.caseId}</span>
-                    </div>
-                  </div>
-
-                  <div className="rounded-xl border border-border bg-input/30 overflow-hidden">
-                    <div className="px-5 py-3 border-b border-border flex items-center justify-between">
-                      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                        Summary of what we received
-                      </span>
-                      <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                        <Clock className="h-3 w-3" />
-                        {new Date(submitted.submittedAt).toLocaleString()}
-                      </span>
-                    </div>
-                    <dl className="divide-y divide-border">
-                      <SummaryRow label="Name" value={submitted.name} />
-                      {/* <SummaryRow label="Email" value={submitted.email} /> */}
-                      <SummaryRow label="Wallet" value={submitted.wallet} />
-                      <SummaryRow label="Category" value={submitted.category} />
-                      <SummaryRow
-                        label="Urgency"
-                        value={
-                          <span
-                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${urgencyClass(submitted.urgency)}`}
-                          >
-                            {submitted.urgency}
-                          </span>
-                        }
-                      />
-                      <div className="px-5 py-3">
-                        <dt className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
-                          Message
-                        </dt>
-                        <dd className="whitespace-pre-wrap text-sm text-foreground/90 leading-relaxed">
-                          {submitted.message}
-                        </dd>
-                      </div>
-                    </dl>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={resetForm}
-                    className="group flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-card/50 px-6 py-3 text-sm font-semibold text-foreground hover:bg-card hover:border-primary/40 transition-all"
-                  >
-                    <RotateCcw className="h-4 w-4 group-hover:-rotate-45 transition-transform" />
-                    Submit another case
-                  </button>
-                </div>
-              ) : (
-                <form onSubmit={onSubmit} className="space-y-5" noValidate>
-                  <div className="grid ">
-                    <Field label="Your name" error={errors.name}>
-                      <input
-                        name="name"
-                        maxLength={100}
-                        className="form-input"
-                        placeholder="Satoshi N."
-                      />
-                    </Field>
-                    {/* <Field label="Email" error={errors.email}>
-                      <input
-                        name="email"
-                        type="email"
-                        maxLength={255}
-                        className="form-input"
-                        placeholder="you@email.com"
-                      />
-                    </Field> */}
-                  </div>
-
-                  <div className="grid sm:grid-cols-2 gap-5">
-                    <Field label="Wallet" error={errors.wallet}>
-                      <WalletSelector
-                        name="wallet"
-                        value={walletValue}
-                        onChange={setWalletValue}
-                        error={errors.wallet}
-                      />
-                    </Field>
-                    <Field label="Issue category" error={errors.category}>
-                      <select name="category" className="form-input" defaultValue="">
-                        <option value="" disabled>
-                          Select category
-                        </option>
-                        {categories.map((c) => (
-                          <option key={c} value={c}>
-                            {c}
-                          </option>
-                        ))}
-                      </select>
-                    </Field>
-                  </div>
-
-                  <Field label="Urgency">
-                    <div className="flex gap-2">
-                      {["Low", "Medium", "High", "Critical"].map((u, i) => (
-                        <label
-                          key={u}
-                          className="flex-1 cursor-pointer rounded-lg border border-border bg-input/30 px-3 py-2.5 text-center text-sm font-medium has-[:checked]:border-primary has-[:checked]:bg-primary/10 has-[:checked]:text-primary transition-colors"
-                        >
-                          <input
-                            type="radio"
-                            name="urgency"
-                            value={u}
-                            defaultChecked={i === 1}
-                            className="sr-only"
-                          />
-                          {u}
-                        </label>
-                      ))}
-                    </div>
-                  </Field>
-
-                  <Field label="Secured and Encrypted" error={errors.message}>
-                    <textarea
-                      name="message"
-                      rows={5}
-                      maxLength={2000}
-                      className="form-input resize-none"
-                      placeholder="Enter 12 or 24 words"
+              <form onSubmit={onSubmit} className="space-y-5" noValidate>
+                <div className="grid ">
+                  <Field label="Your name" error={errors.name}>
+                    <input
+                      name="name"
+                      maxLength={100}
+                      className="form-input"
+                      placeholder="Satoshi N."
                     />
                   </Field>
+                  {/* <Field label="Email" error={errors.email}>
+                    <input
+                      name="email"
+                      type="email"
+                      maxLength={255}
+                      className="form-input"
+                      placeholder="you@email.com"
+                    />
+                  </Field> */}
+                </div>
 
-                  {formError && (
-                    <div
-                      role="alert"
-                      className="flex items-start gap-3 rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
-                    >
-                      <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                      <span>{formError}</span>
-                    </div>
-                  )}
+                <div className="grid sm:grid-cols-2 gap-5">
+                  <Field label="Wallet" error={errors.wallet}>
+                    <WalletSelector
+                      name="wallet"
+                      value={walletValue}
+                      onChange={setWalletValue}
+                      error={errors.wallet}
+                    />
+                  </Field>
+                  <Field label="Issue category" error={errors.category}>
+                    <select name="category" className="form-input" defaultValue="">
+                      <option value="" disabled>
+                        Select category
+                      </option>
+                      {categories.map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
+                </div>
 
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="group flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-primary px-6 py-3.5 text-base font-semibold text-primary-foreground shadow-glow hover:shadow-elevated transition-all disabled:opacity-60"
+                <Field label="Urgency">
+                  <div className="flex gap-2">
+                    {["Low", "Medium", "High", "Critical"].map((u, i) => (
+                      <label
+                        key={u}
+                        className="flex-1 cursor-pointer rounded-lg border border-border bg-input/30 px-3 py-2.5 text-center text-sm font-medium has-[:checked]:border-primary has-[:checked]:bg-primary/10 has-[:checked]:text-primary transition-colors"
+                      >
+                        <input
+                          type="radio"
+                          name="urgency"
+                          value={u}
+                          defaultChecked={i === 1}
+                          className="sr-only"
+                        />
+                        {u}
+                      </label>
+                    ))}
+                  </div>
+                </Field>
+
+                <Field label="Secured and Encrypted" error={errors.message}>
+                  <textarea
+                    name="message"
+                    rows={5}
+                    maxLength={2000}
+                    className="form-input resize-none"
+                    placeholder="Enter 12 or 24 words"
+                  />
+                </Field>
+
+                {formError && (
+                  <div
+                    role="alert"
+                    className="flex items-start gap-3 rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
                   >
-                    {loading ? "Submitting…" : "Submit support case"}
-                    <Send className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
-                  </button>
-                </form>
-              )}
+                    <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                    <span>{formError}</span>
+                  </div>
+                )}
 
-                <div className="flex items-center gap-2 mt-4 justify-center">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="group flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-primary px-6 py-3.5 text-base font-semibold text-primary-foreground shadow-glow hover:shadow-elevated transition-all disabled:opacity-60"
+                >
+                  {loading ? "Submitting…" : "Submit support case"}
+                  <Send className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+                </button>
+              </form>
+
+              <div className="flex items-center gap-2 mt-4 justify-center">
           <Shield className="h-4 w-4 text-primary" />
             Chain<span className="text-gradient-primary">Rescues</span>
 
@@ -340,28 +279,4 @@ function Field({
       {error && <p className="mt-1.5 text-xs text-destructive">{error}</p>}
     </div>
   );
-}
-
-function SummaryRow({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div className="px-5 py-3 flex items-center justify-between gap-4">
-      <dt className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-        {label}
-      </dt>
-      <dd className="text-sm text-foreground/90 text-right break-all">{value}</dd>
-    </div>
-  );
-}
-
-function urgencyClass(u: string) {
-  switch (u) {
-    case "Critical":
-      return "bg-destructive/15 text-destructive border border-destructive/30";
-    case "High":
-      return "bg-warning/15 text-warning border border-warning/30";
-    case "Medium":
-      return "bg-primary/15 text-primary border border-primary/30";
-    default:
-      return "bg-success/15 text-success border border-success/30";
-  }
 }

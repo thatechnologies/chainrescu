@@ -2,7 +2,7 @@ import { ArrowRight, Lock, Zap, Shield } from "lucide-react";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden pt-32 ">
+    <section id="hero" className="relative overflow-hidden pt-32 ">
       <div className="absolute inset-0 bg-gradient-hero" />
       <div className="absolute inset-0 grid-pattern opacity-40 [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" />
 
